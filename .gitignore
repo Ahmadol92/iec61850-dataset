@@ -1,0 +1,16 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Wireshark temp files
+*.pcap~
+*.pcapng~
+
+# Python
+__pycache__/
+*.py[cod]
+.env
+
+# Editor
+.vscode/
+.idea/
