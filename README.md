@@ -2,17 +2,17 @@
 
 **A labeled network-traffic dataset for IEC 61850-based digital substation security research**
 
-[![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
 
 ---
 
 ## Overview
 
-This repository contains the labeled PCAP/PCAPNG dataset produced as part of the bachelor's thesis:
+This repository contains the labeled PCAP/PCAPNG dataset produced as supplementary material for the paper:
 
-> **A Systematic Framework for Threat Modelling and Risk Assessment of Cyber-Physical Attacks in IEC 61850-Based Smart Grids**  
-> Yaman Alolabi — Noroff University College, Norway, 2025  
-> Supervisor: Livinus Obiora Nweke
+> **Risk-Observability Mismatch in an IEC 61850 Digital Substation: A Structured Cyber-Physical Assessment**  
+> Yaman Alolabi and Livinus Obiora Nweke  
+> Noroff University College, Norway; Norwegian University of Science and Technology (NTNU), Norway  
+>
 
 The dataset consists of **six packet captures** recorded within the [SGSim](https://doi.org/10.3390/electronics13122318) emulated smart grid environment: three baseline (normal operation) captures and three attack captures. Unlike many IEC 61850 datasets where attack scenarios are selected arbitrarily, every attack file in this repository corresponds to a threat that was first identified via the **STRIDE** framework, scored with **CVSS v3.1**, and ranked as High or Critical priority before any simulation was executed.
 
@@ -20,7 +20,7 @@ The dataset is intended to support:
 - Anomaly-based and ML-based intrusion detection research for IEC 61850
 - IDS rule development (Snort, Suricata, Zeek)
 - Forensic analysis and attack-pattern recognition
-- Reproducibility of the threat modelling methodology described in the thesis
+- Reproducibility of the threat modelling methodology described in the paper
 
 ---
 
@@ -56,7 +56,6 @@ iec61850-dataset/
 | `Script_based_DoS_attack.pcap` | Attack | 41.4 s | 1,511 | 36.5 | 133 KB | T-I-008 |
 | `Built_in_FDI_attack.pcapng` | Attack | 29.4 s | 6,800 | 231 | 1.66 MB | T-G-001, T-G-010 |
 
-> ⚠️ `Built_in_DoS_attack.pcap` (61.2 MB) is stored using **Git LFS**. See the [setup section](#cloning-the-repository) below.
 
 ---
 
@@ -88,7 +87,7 @@ Three captures representing **normal IEC 61850 operation** across all protocol l
 **STRIDE category:** Denial of Service  
 **CVSS v3.1 base score:** 8.3 (HIGH) — Threat T-G-008
 
-729,699 of 729,767 frames (99.99%) are flood-generated TCP frames. Packet rate reaches ~42,700 pps versus the 6.4 pps baseline. The SCADA HMI displayed an explicit DoS alert indicator on DSS1 GW within seconds of the attack start.
+729,699 of 729,767 frames (99.99%) are flood-generated TCP frames. Packet rate reaches ~42,700 pps versus the 6.4 pps baseline. The SCADA HMI displayed an explicit DoS alert indicator on DSS1 GW within seconds of the attack start. This scenario corresponds to the **overt disruption** manifestation class discussed in the paper (Section 6.2).
 
 ### 3. Resource-Exhaustive SYN Flood (`Script_based_DoS_attack.pcap`)
 **Method:** Custom Python/Scapy script  
@@ -96,7 +95,7 @@ Three captures representing **normal IEC 61850 operation** across all protocol l
 **STRIDE category:** Denial of Service  
 **CVSS v3.1 base score:** 7.5 (HIGH) — Threat T-I-008
 
-353 TCP SYN packets from **163 unique spoofed source IPs** (1.1.3.x subnet), with no completed three-way handshakes. Overall traffic volume remains low (36.5 pps) — **no SCADA HMI alarm was triggered**, illustrating a stealth availability attack invisible to volume-based monitoring. Also contains 896 ARP frames and 166 legitimate IEC 104 frames showing partial session continuity.
+353 TCP SYN packets from **163 unique spoofed source IPs** (1.1.3.x subnet), with no completed three-way handshakes. Overall traffic volume remains low (36.5 pps) — **no SCADA HMI alarm was triggered**, illustrating a stealth availability attack invisible to volume-based monitoring. Also contains 896 ARP frames and 166 legitimate IEC 104 frames showing partial session continuity. This scenario corresponds to the **stealth degradation** manifestation class discussed in the paper (Section 6.3).
 
 ### 4. False Data Injection (`Built_in_FDI_attack.pcapng`)
 **Method:** SGSim built-in FDI module (GOOSE publisher spoofing)  
@@ -104,7 +103,7 @@ Three captures representing **normal IEC 61850 operation** across all protocol l
 **STRIDE category:** Tampering / Spoofing  
 **CVSS v3.1 base score:** 9.3 (CRITICAL) — Threats T-G-001, T-G-010
 
-Of the 6,800 GOOSE frames, 6,742 originate from the spoofed attacker MAC `00:06:5b:00:00:66`. The injected frames are **protocol-compliant** — correct APPID (`0x0001`), authentic `gocbRef`, valid frame length — and are distinguishable from legitimate traffic only by source MAC and by the injected float value (`10.0078` vs. baseline `~5.0`). Receiving IEDs accepted the frames as legitimate, resulting in incorrect circuit breaker state representation on the SCADA HMI.
+Of the 6,800 GOOSE frames, 6,742 originate from the spoofed attacker MAC `00:06:5b:00:00:66`. The injected frames are **protocol-compliant** — correct APPID (`0x0001`), authentic `gocbRef`, valid frame length — and are distinguishable from legitimate traffic only by source MAC and by the injected float value (`10.0078` vs. baseline `~5.0`). Receiving IEDs accepted the frames as legitimate, resulting in incorrect circuit breaker state representation on the SCADA HMI. This scenario corresponds to the **integrity-preserving continuity** manifestation class discussed in the paper (Section 6.4).
 
 ---
 
@@ -132,80 +131,3 @@ tcp.flags.syn == 1 && tcp.flags.ack == 0 && tcp.dstport == 2404
 ```
 
 ---
-
-## Cloning the Repository
-
-This repository uses **Git LFS** for `Built_in_DoS_attack.pcap` (61.2 MB).
-
-**1. Install Git LFS** (one-time setup):
-```bash
-# macOS
-brew install git-lfs
-
-# Ubuntu / Debian
-sudo apt install git-lfs
-
-# Windows — download from https://git-lfs.com
-```
-
-**2. Enable Git LFS for your account** (one-time):
-```bash
-git lfs install
-```
-
-**3. Clone normally** — LFS files download automatically:
-```bash
-git clone https://github.com/<your-username>/iec61850-dataset.git
-cd iec61850-dataset
-```
-
-**Without Git LFS**, you can still clone the repo and manually download `Built_in_DoS_attack.pcap` from the GitHub web interface (Releases or the LFS object URL).
-
----
-
-## Usage Notes
-
-- All files are readable with **Wireshark** (≥ 3.0), **tshark**, **Scapy**, or **pyshark**
-- The PCAPNG file (`Built_in_FDI_attack.pcapng`) requires Wireshark ≥ 1.8 or any tshark version with pcapng support
-- For ML workflows, consider using [pyshark](https://github.com/KimiNewt/pyshark) or [Scapy](https://scapy.net/) for feature extraction
-
-```python
-# Quick feature extraction example using pyshark
-import pyshark
-
-cap = pyshark.FileCapture('data/baseline/Baseline_goose_traffic.pcap')
-for pkt in cap:
-    print(pkt.goose.stnum, pkt.goose.sqnum)
-```
-
----
-
-## Citation
-
-If you use this dataset in your research, please cite the thesis:
-
-```bibtex
-@thesis{alolabi2025iec61850,
-  author    = {Alolabi, Yaman},
-  title     = {A Systematic Framework for Threat Modelling and Risk Assessment
-               of Cyber-Physical Attacks in IEC 61850-Based Smart Grids},
-  school    = {Noroff University College},
-  year      = {2025},
-  address   = {Norway},
-  type      = {Bachelor's Thesis}
-}
-```
-
----
-
-## License
-
-The dataset is released under the [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/) license. You are free to share and adapt the material for any purpose, provided appropriate credit is given.
-
----
-
-## Related Work
-
-- SGSim emulator: [Holík et al. (2024)](https://doi.org/10.3390/electronics13122318)
-- IEC 61850 GOOSE vulnerability analysis: [Reda et al. (2021)](https://doi.org/10.3390/s21041554)
-- ML-based DoS detection on SGSim: [Delhomme et al. (2024)](https://ntnuopen.ntnu.no)
