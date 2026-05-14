@@ -21,7 +21,7 @@ This repository contains supplementary materials for the paper:
 
 Run:
 
-python scripts/generate_pcap_timeseries.py --data-dir ./data --out-dir ./figures --zip
+python scripts/Time-series_plotting_script.py --data-dir ./data --out-dir ./figures --zip
 
 ## Dependencies
 
